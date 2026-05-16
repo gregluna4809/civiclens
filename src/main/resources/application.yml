@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: civiclens-api
+
+  datasource:
+    # Environment variables keep local, Render, and Supabase configuration separate from code.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/civiclens}
+    username: ${SPRING_DATASOURCE_USERNAME:civiclens}
+    password: ${SPRING_DATASOURCE_PASSWORD:civiclens}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # Flyway owns schema changes; Hibernate should not mutate production tables.
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
