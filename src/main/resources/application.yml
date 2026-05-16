@@ -5,8 +5,8 @@ spring:
   datasource:
     # Environment variables keep local, Render, and Supabase configuration separate from code.
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/civiclens}
-    username: ${SPRING_DATASOURCE_USERNAME:civiclens}
-    password: ${SPRING_DATASOURCE_PASSWORD:civiclens}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:root123}
     driver-class-name: org.postgresql.Driver
 
   jpa:
