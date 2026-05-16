@@ -4,6 +4,19 @@ A full-stack civic analytics platform that ingests live NYC 311 service request 
 
 Built as a portfolio-quality engineering application emphasizing backend architecture, data ingestion pipelines, analytics APIs, full-stack integration, and real-world debugging.
 
+---
+
+## Live Demo
+
+| Resource              | URL                                                              |
+|-----------------------|------------------------------------------------------------------|
+| Frontend Dashboard    | https://civiclens-z03r.onrender.com                              |
+| Backend API (Swagger) | https://civiclens-api-cxbd.onrender.com/swagger-ui/index.html    |
+
+> Hosted on Render's free tier — the backend may take 30–60 seconds to spin up on first request after idle.
+
+---
+
 ## Screenshots
 
 ### Dashboard Overview
@@ -12,14 +25,11 @@ Interactive analytics dashboard showing complaint summaries, borough breakdowns,
 
 ![CivicLens Dashboard Overview](docs/dashboard-overview.png)
 
----
-
 ### Data Ingestion Administration
 
 Administrative demo tooling for controlled ingestion, ingestion job history, and dashboard reset functionality.
 
 ![CivicLens Data Ingestion Panel](docs/dashboard-ingestion.png)
-
 
 ---
 
@@ -31,10 +41,12 @@ Administrative demo tooling for controlled ingestion, ingestion job history, and
 - [Tech Stack](#tech-stack)
 - [Data Model](#data-model)
 - [API Endpoints](#api-endpoints)
-- [Local Setup](#local-setup)
-- [Screenshots](#screenshots)
+- [Local Development](#local-development)
+- [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
 - [Engineering Challenges](#engineering-challenges)
 - [Future Enhancements](#future-enhancements)
+- [Author](#author)
 - [License](#license)
 
 ---
@@ -151,6 +163,7 @@ CivicLens follows a backend-first layered architecture.
 **Backend**
 - Java 21
 - Spring Boot 3 (Web, Data JPA, Actuator)
+- Hibernate
 - PostgreSQL
 - Flyway
 - Maven
@@ -161,7 +174,13 @@ CivicLens follows a backend-first layered architecture.
 - TypeScript
 - Vite
 - Recharts
+- Axios
 - CSS
+
+**Deployment**
+- Render Web Service (Spring Boot API)
+- Render PostgreSQL
+- Render Static Site (React frontend)
 
 **External Data Source**
 - NYC Open Data 311 Service Requests API
@@ -218,21 +237,13 @@ Tracks ingestion activity:
 GET /api/health
 ```
 
-### Ingestion
-
-```http
-POST   /api/admin/ingest/311?limit=25     # Trigger ingestion
-GET    /api/admin/ingest/jobs             # Ingestion job history
-DELETE /api/admin/ingest/demo-data        # Reset demo environment
-```
-
 ### Analytics
 
 ```http
-GET /api/analytics/complaints/by-borough
-GET /api/analytics/complaints/top-types
-GET /api/analytics/agencies/top
 GET /api/analytics/complaints/trends
+GET /api/analytics/complaints/top-types
+GET /api/analytics/complaints/by-borough
+GET /api/analytics/agencies/top
 ```
 
 **Example filtered request:**
@@ -241,11 +252,19 @@ GET /api/analytics/complaints/trends
 GET /api/analytics/complaints/by-borough?startDate=2026-05-14&endDate=2026-05-14&borough=Brooklyn
 ```
 
-Full interactive documentation is available via Swagger UI once the backend is running (see [Local Setup](#local-setup)).
+### Admin / Demo Controls
+
+```http
+POST   /api/admin/ingest/311?limit=25     # Trigger ingestion
+GET    /api/admin/ingest/jobs             # Ingestion job history
+DELETE /api/admin/ingest/demo-data        # Reset demo environment
+```
+
+Full interactive documentation is available via Swagger UI: [https://civiclens-api-cxbd.onrender.com/swagger-ui/index.html](https://civiclens-api-cxbd.onrender.com/swagger-ui/index.html)
 
 ---
 
-## Local Setup
+## Local Development
 
 ### Prerequisites
 
@@ -263,28 +282,17 @@ Create the local database:
 CREATE DATABASE civiclens;
 ```
 
-Configure datasource values (environment variables or `application.properties`):
-
-```text
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/civiclens
-SPRING_DATASOURCE_USERNAME=civiclens
-SPRING_DATASOURCE_PASSWORD=your_password
-```
-
-Flyway migrations run automatically at startup.
+Flyway migrations run automatically at backend startup.
 
 ### Run Backend
 
-From the project root:
-
 ```bash
+cd civiclens-api
 ./mvnw spring-boot:run
 ```
 
-| Service      | URL                                       |
-|--------------|-------------------------------------------|
-| Backend API  | `http://localhost:8080`                   |
-| Swagger UI   | `http://localhost:8080/swagger-ui.html`   |
+Backend runs on: `http://localhost:8080`
+Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 
 ### Run Frontend
 
@@ -294,25 +302,45 @@ npm install
 npm run dev
 ```
 
-Frontend: `http://localhost:5173`
+Frontend runs on: `http://localhost:5173`
 
 ---
 
-## Screenshots
+## Environment Variables
 
-Screenshots will be added once deployed.
+### Backend
 
-```markdown
-![Dashboard Overview](docs/dashboard-overview.png)
-![Filtered Analytics](docs/dashboard-filters.png)
-![Ingestion Panel](docs/dashboard-ingestion.png)
-```
+| Variable                     | Description                                       |
+|------------------------------|---------------------------------------------------|
+| `SPRING_DATASOURCE_URL`      | JDBC URL for PostgreSQL                           |
+| `SPRING_DATASOURCE_USERNAME` | Database username                                 |
+| `SPRING_DATASOURCE_PASSWORD` | Database password                                 |
+| `SERVER_PORT`                | Port the Spring Boot application listens on       |
+| `CORS_ALLOWED_ORIGINS`       | Comma-separated list of allowed frontend origins  |
+
+### Frontend
+
+| Variable            | Description                          |
+|---------------------|--------------------------------------|
+| `VITE_API_BASE_URL` | Base URL of the deployed backend API |
+
+---
+
+## Deployment
+
+CivicLens is deployed across three Render services:
+
+- **Backend API** — Render Web Service running the Spring Boot application
+- **Database** — Render managed PostgreSQL instance
+- **Frontend** — Render Static Site serving the built Vite bundle
+
+CORS, environment variables, and the frontend's `VITE_API_BASE_URL` are configured per-service through the Render dashboard.
 
 ---
 
 ## Engineering Challenges
 
-Three real debugging stories from building this project.
+Real debugging stories from building and deploying this project.
 
 ### PostgreSQL Native Query Parameter Typing
 
@@ -334,7 +362,7 @@ This was a genuine backend debugging problem rooted in PostgreSQL semantics — 
 
 The dashboard demo reset feature initially failed when triggered from the frontend.
 
-**Root cause:** Browser DELETE requests triggered a CORS preflight `OPTIONS` request, but backend CORS configuration allowed only `GET` and `POST`.
+**Root cause:** Browser `DELETE` requests triggered a CORS preflight `OPTIONS` request, but the backend CORS configuration allowed only `GET` and `POST`.
 
 **Resolution:** Added `DELETE` and `OPTIONS` support to the CORS configuration and restarted the backend.
 
@@ -354,14 +382,17 @@ This reflects realistic external dependency behavior rather than assuming a perf
 
 ## Future Enhancements
 
-- Cloud deployment
 - Authentication and role-based admin access
+- Better responsive layout for ultrawide displays
+- Pagination and larger dataset ingestion
+- Background job queue
+- Redis caching for analytics queries
 - Scheduled ingestion jobs with retry policies
-- Analytics query caching
 - CSV export
 - Interactive maps
 - Complaint detail drill-down
-- Docker containerization
+- Docker Compose local orchestration
+- AWS deployment
 - CI/CD pipeline
 - Monitoring and observability
 
@@ -378,7 +409,7 @@ CivicLens demonstrates practical engineering skills across:
 - Analytics query design
 - Frontend API integration
 - Production-style debugging
-- Full-stack application delivery
+- Full-stack deployment to a managed cloud platform
 
 The emphasis is on engineering decisions and implementation realism rather than tutorial-style feature breadth.
 
