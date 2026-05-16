@@ -4,6 +4,23 @@ A full-stack civic analytics platform that ingests live NYC 311 service request 
 
 Built as a portfolio-quality engineering application emphasizing backend architecture, data ingestion pipelines, analytics APIs, full-stack integration, and real-world debugging.
 
+## Screenshots
+
+### Dashboard Overview
+
+Interactive analytics dashboard showing complaint summaries, borough breakdowns, trend analysis, complaint category distribution, agency reporting patterns, and ingestion controls.
+
+![CivicLens Dashboard Overview](docs/dashboard-overview.png)
+
+---
+
+### Data Ingestion Administration
+
+Administrative demo tooling for controlled ingestion, ingestion job history, and dashboard reset functionality.
+
+![CivicLens Data Ingestion Panel](docs/dashboard-ingestion.png)
+
+
 ---
 
 ## Table of Contents
