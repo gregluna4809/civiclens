@@ -23,11 +23,11 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
             LEFT JOIN boroughs b ON b.id = c.borough_id
             JOIN agencies a ON a.id = c.agency_id
             JOIN complaint_types ct ON ct.id = c.complaint_type_id
-            WHERE (:startDate IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) >= CAST(:startDate AS DATE)))
-              AND (:endDate IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) <= CAST(:endDate AS DATE)))
-              AND (:borough IS NULL OR LOWER(COALESCE(b.name, 'Unknown')) = LOWER(:borough))
-              AND (:agencyCode IS NULL OR LOWER(a.code) = LOWER(:agencyCode))
-              AND (:complaintType IS NULL OR LOWER(ct.name) = LOWER(:complaintType))
+            WHERE (CAST(:startDate AS date) IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) >= CAST(:startDate AS date)))
+              AND (CAST(:endDate AS date) IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) <= CAST(:endDate AS date)))
+              AND (CAST(:borough AS text) IS NULL OR LOWER(COALESCE(b.name, 'Unknown')) = LOWER(CAST(:borough AS text)))
+              AND (CAST(:agencyCode AS text) IS NULL OR LOWER(a.code) = LOWER(CAST(:agencyCode AS text)))
+              AND (CAST(:complaintType AS text) IS NULL OR LOWER(ct.name) = LOWER(CAST(:complaintType AS text)))
             GROUP BY COALESCE(b.name, 'Unknown')
             ORDER BY COUNT(*) DESC, COALESCE(b.name, 'Unknown') ASC
             """, nativeQuery = true)
@@ -45,11 +45,11 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
             JOIN complaint_types ct ON ct.id = c.complaint_type_id
             JOIN agencies a ON a.id = c.agency_id
             LEFT JOIN boroughs b ON b.id = c.borough_id
-            WHERE (:startDate IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) >= CAST(:startDate AS DATE)))
-              AND (:endDate IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) <= CAST(:endDate AS DATE)))
-              AND (:borough IS NULL OR LOWER(COALESCE(b.name, 'Unknown')) = LOWER(:borough))
-              AND (:agencyCode IS NULL OR LOWER(a.code) = LOWER(:agencyCode))
-              AND (:complaintType IS NULL OR LOWER(ct.name) = LOWER(:complaintType))
+            WHERE (CAST(:startDate AS date) IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) >= CAST(:startDate AS date)))
+              AND (CAST(:endDate AS date) IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) <= CAST(:endDate AS date)))
+              AND (CAST(:borough AS text) IS NULL OR LOWER(COALESCE(b.name, 'Unknown')) = LOWER(CAST(:borough AS text)))
+              AND (CAST(:agencyCode AS text) IS NULL OR LOWER(a.code) = LOWER(CAST(:agencyCode AS text)))
+              AND (CAST(:complaintType AS text) IS NULL OR LOWER(ct.name) = LOWER(CAST(:complaintType AS text)))
             GROUP BY ct.name
             ORDER BY COUNT(*) DESC, ct.name ASC
             LIMIT :limit
@@ -70,11 +70,11 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
             JOIN agencies a ON a.id = c.agency_id
             JOIN complaint_types ct ON ct.id = c.complaint_type_id
             LEFT JOIN boroughs b ON b.id = c.borough_id
-            WHERE (:startDate IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) >= CAST(:startDate AS DATE)))
-              AND (:endDate IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) <= CAST(:endDate AS DATE)))
-              AND (:borough IS NULL OR LOWER(COALESCE(b.name, 'Unknown')) = LOWER(:borough))
-              AND (:agencyCode IS NULL OR LOWER(a.code) = LOWER(:agencyCode))
-              AND (:complaintType IS NULL OR LOWER(ct.name) = LOWER(:complaintType))
+            WHERE (CAST(:startDate AS date) IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) >= CAST(:startDate AS date)))
+              AND (CAST(:endDate AS date) IS NULL OR (c.created_at IS NOT NULL AND CAST(c.created_at AS DATE) <= CAST(:endDate AS date)))
+              AND (CAST(:borough AS text) IS NULL OR LOWER(COALESCE(b.name, 'Unknown')) = LOWER(CAST(:borough AS text)))
+              AND (CAST(:agencyCode AS text) IS NULL OR LOWER(a.code) = LOWER(CAST(:agencyCode AS text)))
+              AND (CAST(:complaintType AS text) IS NULL OR LOWER(ct.name) = LOWER(CAST(:complaintType AS text)))
             GROUP BY a.code, a.name
             ORDER BY COUNT(*) DESC, a.code ASC
             LIMIT :limit

@@ -41,3 +41,6 @@ civiclens:
   nyc-open-data:
     # Override with NYC_OPEN_DATA_BASE_URL env var for testing or alternate endpoints.
     base-url: ${NYC_OPEN_DATA_BASE_URL:https://data.cityofnewyork.us}
+  cors:
+    # Comma-separated origins; set CORS_ALLOWED_ORIGINS in production to the deployed frontend URL.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
