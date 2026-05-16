@@ -36,3 +36,8 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+civiclens:
+  nyc-open-data:
+    # Override with NYC_OPEN_DATA_BASE_URL env var for testing or alternate endpoints.
+    base-url: ${NYC_OPEN_DATA_BASE_URL:https://data.cityofnewyork.us}
