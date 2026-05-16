@@ -1,9 +1,12 @@
+server:
+  port: ${SERVER_PORT:8080}
+
 spring:
   application:
     name: civiclens-api
 
   datasource:
-    # Environment variables keep local, Render, and Supabase configuration separate from code.
+    # Environment variables keep local, Render, and other deployment configuration separate from code.
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/civiclens}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:root123}
