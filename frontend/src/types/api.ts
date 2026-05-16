@@ -31,6 +31,11 @@ export interface IngestionJob {
   errorMessage: string | null;
 }
 
+export interface DemoResetResponse {
+  message: string;
+  deletedAt: string; // ISO-8601 timestamp
+}
+
 export interface AnalyticsFilters {
   startDate: string;
   endDate: string;

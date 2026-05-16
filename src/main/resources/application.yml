@@ -9,6 +9,11 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:root123}
     driver-class-name: org.postgresql.Driver
 
+  # Serialize LocalDateTime fields as ISO-8601 strings instead of numeric arrays.
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
   jpa:
     hibernate:
       # Flyway owns schema changes; Hibernate should not mutate production tables.

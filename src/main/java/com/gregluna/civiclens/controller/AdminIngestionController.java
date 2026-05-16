@@ -1,7 +1,9 @@
 package com.gregluna.civiclens.controller;
 
+import com.gregluna.civiclens.dto.DemoResetResponse;
 import com.gregluna.civiclens.dto.IngestionJobResponse;
 import com.gregluna.civiclens.entity.IngestionJob;
+import com.gregluna.civiclens.service.DemoResetService;
 import com.gregluna.civiclens.service.IngestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 public class AdminIngestionController {
 
     private final IngestionService ingestionService;
+    private final DemoResetService demoResetService;
 
     // Triggers a synchronous ingestion run and returns the resulting job record.
     @PostMapping("/311")
@@ -30,6 +33,13 @@ public class AdminIngestionController {
         return ingestionService.getAllJobs().stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    // Deletes all complaints, reference data, and ingestion history.
+    // Intended for demo and development resets only; protect this endpoint before production use.
+    @DeleteMapping("/demo-data")
+    public ResponseEntity<DemoResetResponse> resetDemoData() {
+        return ResponseEntity.ok(demoResetService.resetAll());
     }
 
     private IngestionJobResponse toResponse(IngestionJob job) {

@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(New-Item *)"
+      "PowerShell(New-Item *)",
+      "Bash(npm run *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\gvl71\\\\OneDrive\\\\Desktop\\\\Projects\\\\civiclens-api\" -Recurse -Filter \"*.java\")",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }

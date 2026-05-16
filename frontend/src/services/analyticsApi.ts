@@ -27,10 +27,26 @@ function buildQueryString(
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`);
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`);
+  } catch {
+    throw new Error('Unable to reach the server. Check your connection and try again.');
+  }
   if (!res.ok) {
+    if (res.status >= 500) {
+      throw new Error('The server encountered an error. Please try again later.');
+    }
+    // Extract a readable message from 4xx error bodies before surfacing to the UI.
     const body = await res.text().catch(() => '');
-    throw new Error(`Request failed (${res.status}): ${body || res.statusText}`);
+    let message = body;
+    try {
+      const json = JSON.parse(body) as Record<string, unknown>;
+      message = (json.message as string) ?? (json.error as string) ?? body;
+    } catch {
+      // body is plain text; use as-is
+    }
+    throw new Error(message || `Request failed (${res.status})`);
   }
   return res.json() as Promise<T>;
 }

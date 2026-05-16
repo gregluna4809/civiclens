@@ -24,6 +24,21 @@ import {
 } from '../services/analyticsApi';
 import { fetchIngestionJobs } from '../services/ingestionApi';
 
+// Bar chart skeleton shown while analytics data is loading.
+function ChartSkeleton() {
+  return (
+    <div className="chart-skeleton" aria-hidden="true">
+      {[55, 80, 40, 90, 65, 75].map((h, i) => (
+        <div
+          key={i}
+          className="skeleton chart-skeleton-bar"
+          style={{ height: `${h}%` }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function Dashboard() {
   const [boroughs, setBoroughs] = useState<BoroughComplaintCount[]>([]);
   const [types, setTypes] = useState<ComplaintTypeCount[]>([]);
@@ -53,7 +68,7 @@ export function Dashboard() {
         setTrends(trendData);
         setJobs(jobData);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load data from the backend');
+        setError(e instanceof Error ? e.message : 'Failed to load data from the backend.');
       } finally {
         setLoading(false);
       }
@@ -76,7 +91,31 @@ export function Dashboard() {
       setAgencies(agencyData);
       setTrends(trendData);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load analytics data');
+      setError(e instanceof Error ? e.message : 'Failed to load analytics data.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Reloads all analytics and jobs after a demo reset so the dashboard reflects the empty state.
+  async function handleReset() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [boroughData, typeData, agencyData, trendData, jobData] = await Promise.all([
+        fetchComplaintsByBorough(EMPTY_FILTERS),
+        fetchTopComplaintTypes(EMPTY_FILTERS),
+        fetchTopAgencies(EMPTY_FILTERS),
+        fetchComplaintTrends(EMPTY_FILTERS),
+        fetchIngestionJobs(),
+      ]);
+      setBoroughs(boroughData);
+      setTypes(typeData);
+      setAgencies(agencyData);
+      setTrends(trendData);
+      setJobs(jobData);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to reload data after reset.');
     } finally {
       setLoading(false);
     }
@@ -90,7 +129,12 @@ export function Dashboard() {
 
         {error && (
           <div className="alert alert-error">
-            <strong>Error:</strong> {error}
+            <svg className="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
 
@@ -104,31 +148,23 @@ export function Dashboard() {
         <div className="charts-grid">
           <div className="card chart-card">
             <h2 className="section-title">Complaints by Borough</h2>
-            {loading
-              ? <div className="loading-placeholder">Loading…</div>
-              : <BoroughChart data={boroughs} />}
+            {loading ? <ChartSkeleton /> : <BoroughChart data={boroughs} />}
           </div>
           <div className="card chart-card">
             <h2 className="section-title">Complaint Trends</h2>
-            {loading
-              ? <div className="loading-placeholder">Loading…</div>
-              : <TrendsChart data={trends} />}
+            {loading ? <ChartSkeleton /> : <TrendsChart data={trends} />}
           </div>
           <div className="card chart-card">
             <h2 className="section-title">Top Complaint Types</h2>
-            {loading
-              ? <div className="loading-placeholder">Loading…</div>
-              : <TopTypesChart data={types} />}
+            {loading ? <ChartSkeleton /> : <TopTypesChart data={types} />}
           </div>
           <div className="card chart-card">
             <h2 className="section-title">Top Agencies</h2>
-            {loading
-              ? <div className="loading-placeholder">Loading…</div>
-              : <TopAgenciesChart data={agencies} />}
+            {loading ? <ChartSkeleton /> : <TopAgenciesChart data={agencies} />}
           </div>
         </div>
 
-        <IngestionPanel jobs={jobs} onJobsChange={setJobs} />
+        <IngestionPanel jobs={jobs} onJobsChange={setJobs} loading={loading} onReset={handleReset} />
       </main>
     </>
   );
